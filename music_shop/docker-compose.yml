@@ -1,0 +1,10 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:13
+    ports:
+      - "$MUSIC_SHOP_DB_PORT:5432"
+    environment:
+      POSTGRES_USER: $MUSIC_SHOP_DB_USER
+      POSTGRES_PASSWORD: $MUSIC_SHOP_DB_PASSWORD
+      POSTGRES_DB: $MUSIC_SHOP_DB_NAME
