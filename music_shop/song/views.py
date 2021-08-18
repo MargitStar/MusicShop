@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from rest_framework.viewsets import ModelViewSet
 
-# Create your views here.
+from song.models import Song
+from song.serializers import SongSerializer
+
+
+class SongViewSet(ModelViewSet):
+    queryset = Song.objects.all()
+    serializer_class = SongSerializer

@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+
     class Meta:
         model = Genre
-        fields = ('name', 'description')
+        fields = ('id', 'name', 'description')
