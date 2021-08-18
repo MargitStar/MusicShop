@@ -31,11 +31,11 @@ ALLOWED_HOSTS = os.environ['MUSIC_SHOP_ALLOWED_HOSTS'].split(',')
 # Application definition
 
 MY_APPS = [
-
+    'genre',
 ]
 
 THIRD_PARTY_APPS = [
-
+    'rest_framework',
 ]
 
 INSTALLED_APPS = [
@@ -130,3 +130,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
