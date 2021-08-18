@@ -22,7 +22,7 @@ class Song(models.Model):
     )
 
     data = models.FileField(
-
+        upload_to='music'
     )
 
     def __str__(self):

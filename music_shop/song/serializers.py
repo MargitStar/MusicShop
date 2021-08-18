@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
+from author.models import Author
 from author.serializers import AuthorSerializer
+from genre.models import Genre
 from genre.serializers import GenreSerializer
 from song.models import Song
-from author.models import Author
-from genre.models import Genre
 
 
 class SongSerializer(serializers.ModelSerializer):
