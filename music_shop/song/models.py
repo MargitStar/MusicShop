@@ -4,6 +4,15 @@ from author.models import Author
 from genre.models import Genre
 
 
+class SongData(models.Model):
+    data = models.FileField(
+        upload_to='music'
+    )
+
+    def __str__(self):
+        return f'Song Data {self.pk}'
+
+
 class Song(models.Model):
     title = models.CharField(
         max_length=100,
@@ -21,8 +30,10 @@ class Song(models.Model):
         Genre,
     )
 
-    data = models.FileField(
-        upload_to='music'
+    data = models.OneToOneField(
+        SongData,
+        on_delete=models.CASCADE,
+        verbose_name='song'
     )
 
     def __str__(self):

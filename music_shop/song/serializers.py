@@ -4,12 +4,22 @@ from author.models import Author
 from author.serializers import AuthorSerializer
 from genre.models import Genre
 from genre.serializers import GenreSerializer
-from song.models import Song
+from song.models import Song, SongData
 
 
-class SongSerializer(serializers.ModelSerializer):
+class SongDataSerializerGet(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = SongData
+        fields = ('data',)
+
+
+class SongSerializerGet(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     author = AuthorSerializer(many=True)
+    data = serializers.HyperlinkedRelatedField(
+        read_only=True,
+        view_name='song-data',
+    )
 
     class Meta:
         model = Song
