@@ -13,6 +13,14 @@ class SongDataSerializerGet(serializers.HyperlinkedModelSerializer):
         fields = ('data',)
 
 
+class SongDataSerializerPost(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+
+    class Meta:
+        model = SongData
+        fields = ('id',)
+
+
 class SongSerializerGet(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     author = AuthorSerializer(many=True)
@@ -25,10 +33,23 @@ class SongSerializerGet(serializers.ModelSerializer):
         model = Song
         fields = ('title', 'author', 'date', 'genre', 'data')
 
+
+class SongSerializerPost(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True)
+    author = AuthorSerializer(many=True)
+    data = SongDataSerializerPost()
+
+    class Meta:
+        model = Song
+        fields = ('title','author', 'genre', 'date',  'data')
+
     def create(self, validated_data):
         genre = validated_data.pop('genre', [])
         author = validated_data.pop('author', [])
-        song = Song.objects.create(**validated_data)
+
+        data = validated_data.pop('data')
+        data_ = SongData.objects.get(pk=data.get('id'))
+        song = Song.objects.create(data=data_, **validated_data)
 
         for current in genre:
             genre_ = Genre.objects.get(pk=current.get('id'))
@@ -46,9 +67,8 @@ class SongSerializerGet(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         author = validated_data.get('author')
-        genre = validated_data.get('author')
+        genre = validated_data.get('genre')
         instance.title = validated_data.get('title')
-        instance.data = validated_data.get('data')
         instance.date = validated_data.get('date')
 
         try:
@@ -65,4 +85,4 @@ class SongSerializerGet(serializers.ModelSerializer):
             instance.genre.clear()
             instance.author.clear()
             instance.save()
-            return instance
+        return instance
