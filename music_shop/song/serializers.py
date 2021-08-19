@@ -10,7 +10,7 @@ from song.models import Song, SongData
 class SongDataSerializerGet(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = SongData
-        fields = ('data',)
+        fields = ("data",)
 
 
 class SongDataSerializerPost(serializers.ModelSerializer):
@@ -18,7 +18,7 @@ class SongDataSerializerPost(serializers.ModelSerializer):
 
     class Meta:
         model = SongData
-        fields = ('id',)
+        fields = ("id",)
 
 
 class SongSerializerGet(serializers.ModelSerializer):
@@ -26,12 +26,12 @@ class SongSerializerGet(serializers.ModelSerializer):
     author = AuthorSerializer(many=True)
     data = serializers.HyperlinkedRelatedField(
         read_only=True,
-        view_name='song-data',
+        view_name="song-data",
     )
 
     class Meta:
         model = Song
-        fields = ('title', 'author', 'date', 'genre', 'data')
+        fields = ("title", "author", "date", "genre", "data")
 
 
 class SongSerializerPost(serializers.ModelSerializer):
@@ -41,22 +41,22 @@ class SongSerializerPost(serializers.ModelSerializer):
 
     class Meta:
         model = Song
-        fields = ('title','author', 'genre', 'date',  'data')
+        fields = ("title", "author", "genre", "date", "data")
 
     def create(self, validated_data):
-        genre = validated_data.pop('genre', [])
-        author = validated_data.pop('author', [])
+        genre = validated_data.pop("genre", [])
+        author = validated_data.pop("author", [])
 
-        data = validated_data.pop('data')
-        data_ = SongData.objects.get(pk=data.get('id'))
+        data = validated_data.pop("data")
+        data_ = SongData.objects.get(pk=data.get("id"))
         song = Song.objects.create(data=data_, **validated_data)
 
         for current in genre:
-            genre_ = Genre.objects.get(pk=current.get('id'))
+            genre_ = Genre.objects.get(pk=current.get("id"))
             song.genre.add(genre_)
 
         for current in author:
-            author_ = Author.objects.get(pk=current.get('id'))
+            author_ = Author.objects.get(pk=current.get("id"))
             song.author.add(author_)
         return song
 
@@ -66,10 +66,10 @@ class SongSerializerPost(serializers.ModelSerializer):
             return value
 
     def update(self, instance, validated_data):
-        author = validated_data.get('author')
-        genre = validated_data.get('genre')
-        instance.title = validated_data.get('title')
-        instance.date = validated_data.get('date')
+        author = validated_data.get("author")
+        genre = validated_data.get("genre")
+        instance.title = validated_data.get("title")
+        instance.date = validated_data.get("date")
 
         try:
             for inst in author:

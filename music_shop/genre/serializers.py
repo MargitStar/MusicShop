@@ -1,5 +1,6 @@
-from genre.models import Genre
 from rest_framework import serializers
+
+from genre.models import Genre
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -7,4 +8,4 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ('id', 'name', 'description')
+        fields = ("id", "name", "description")
