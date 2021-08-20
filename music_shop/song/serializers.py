@@ -31,7 +31,7 @@ class SongSerializerGet(serializers.ModelSerializer):
 
     class Meta:
         model = Song
-        fields = ("title", "author", "date", "genre", "data")
+        fields = ("title", "author", "release_date", "genre", "data")
 
 
 class SongSerializerPost(serializers.ModelSerializer):
@@ -41,13 +41,13 @@ class SongSerializerPost(serializers.ModelSerializer):
 
     class Meta:
         model = Song
-        fields = ("title", "author", "genre", "date", "data")
+        fields = ("title", "author", "genre", "release_date", "data")
 
     def create(self, validated_data):
         genre = validated_data.pop("genre", [])
         author = validated_data.pop("author", [])
 
-        data = validated_data.pop("data")
+        data = validated_data.pop("release_date")
         data_ = SongData.objects.get(pk=data.get("id"))
         song = Song.objects.create(data=data_, **validated_data)
 
@@ -66,20 +66,20 @@ class SongSerializerPost(serializers.ModelSerializer):
             return value
 
     def update(self, instance, validated_data):
-        author = validated_data.get("author")
-        genre = validated_data.get("genre")
+        authors = validated_data.get("author")
+        genres = validated_data.get("genre")
         instance.title = validated_data.get("title")
-        instance.date = validated_data.get("date")
+        instance.release_date = validated_data.get("release_date")
 
         try:
             instance.author.clear()
             instance.genre.clear()
 
-            for inst in author:
-                instance.author.add(self.unpack_dict(inst))
+            for author in authors:
+                instance.author.add(self.unpack_dict(author))
 
-            for inst in genre:
-                instance.genre.add(self.unpack_dict(inst))
+            for genre in genres:
+                instance.genre.add(self.unpack_dict(genre))
 
             instance.save()
             return instance

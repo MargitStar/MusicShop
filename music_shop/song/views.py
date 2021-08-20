@@ -16,7 +16,7 @@ class SongDataCreateView(viewsets.GenericViewSet, mixins.CreateModelMixin):
 class SongViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = (
-        "date",
+        "release_date",
         "author__name",
         "author__surname",
         "title",
