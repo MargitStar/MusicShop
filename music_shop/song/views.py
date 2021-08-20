@@ -28,7 +28,8 @@ class SongViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == "GET":
             return SongSerializerGet
-        return SongSerializerPost
+        elif self.request.method != "DELETE":
+            return SongSerializerPost
 
     @action(detail=True, methods=["get"])
     def data(self, request, pk=None):
