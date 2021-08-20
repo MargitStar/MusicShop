@@ -12,20 +12,10 @@ class SongData(models.Model):
 
 
 class Song(models.Model):
-    title = models.CharField(
-        max_length=100,
-    )
-
-    author = models.ManyToManyField(
-        Author,
-    )
-
-    date = models.DateField()
-
-    genre = models.ManyToManyField(
-        Genre,
-    )
-
+    title = models.CharField(max_length=100)
+    author = models.ManyToManyField(Author)
+    release_date = models.DateField()
+    genre = models.ManyToManyField(Genre)
     data = models.OneToOneField(SongData, on_delete=models.CASCADE, verbose_name="song")
 
     def __str__(self):
