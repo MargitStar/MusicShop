@@ -60,11 +60,6 @@ class SongSerializerPost(serializers.ModelSerializer):
             song.author.add(author_)
         return song
 
-    @staticmethod
-    def unpack_dict(dictionary):
-        for key, value in dictionary.items():
-            return value
-
     def update(self, instance, validated_data):
         authors = validated_data.get("author")
         genres = validated_data.get("genre")
@@ -76,10 +71,10 @@ class SongSerializerPost(serializers.ModelSerializer):
             instance.genre.clear()
 
             for author in authors:
-                instance.author.add(self.unpack_dict(author))
+                instance.author.add(author['id'])
 
             for genre in genres:
-                instance.genre.add(self.unpack_dict(genre))
+                instance.genre.add(genre['id'])
 
             instance.save()
             return instance
