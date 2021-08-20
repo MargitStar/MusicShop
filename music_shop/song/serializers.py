@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
 from author.models import Author
-from author.serializers import AuthorSerializer
+from author.serializers import AuthorSerializerGet, AuthorSerializerPost
 from genre.models import Genre
-from genre.serializers import GenreSerializer
+from genre.serializers import GenreSerializerGet, GenreSerializerPost
 from song.models import Song, SongData
 
 
@@ -22,8 +22,8 @@ class SongDataSerializerPost(serializers.ModelSerializer):
 
 
 class SongSerializerGet(serializers.ModelSerializer):
-    genre = GenreSerializer(many=True)
-    author = AuthorSerializer(many=True)
+    genre = GenreSerializerGet(many=True)
+    author = AuthorSerializerGet(many=True)
     data = serializers.HyperlinkedRelatedField(
         read_only=True,
         view_name="song-data",
@@ -35,8 +35,8 @@ class SongSerializerGet(serializers.ModelSerializer):
 
 
 class SongSerializerPost(serializers.ModelSerializer):
-    genre = GenreSerializer(many=True)
-    author = AuthorSerializer(many=True)
+    genre = GenreSerializerPost(many=True)
+    author = AuthorSerializerPost(many=True)
     data = SongDataSerializerPost()
 
     class Meta:
@@ -72,13 +72,15 @@ class SongSerializerPost(serializers.ModelSerializer):
         instance.date = validated_data.get("date")
 
         try:
+            instance.author.clear()
+            instance.genre.clear()
+
             for inst in author:
-                instance.author.clear()
                 instance.author.add(self.unpack_dict(inst))
 
             for inst in genre:
-                instance.genre.clear()
                 instance.genre.add(self.unpack_dict(inst))
+
             instance.save()
             return instance
         except TypeError:
