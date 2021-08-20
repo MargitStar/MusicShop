@@ -47,7 +47,7 @@ class SongSerializerPost(serializers.ModelSerializer):
         genre = validated_data.pop("genre", [])
         author = validated_data.pop("author", [])
 
-        data = validated_data.pop("release_date")
+        data = validated_data.pop("data")
         data_ = SongData.objects.get(pk=data.get("id"))
         song = Song.objects.create(data=data_, **validated_data)
 
