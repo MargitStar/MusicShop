@@ -21,6 +21,7 @@ from django.urls import include, path
 urlpatterns = [
     path('api/', include('song.urls')),
     path('admin/', admin.site.urls),
+    path('api/', include('user.urls', namespace='user')),
 ]
 
 if settings.DEBUG:
