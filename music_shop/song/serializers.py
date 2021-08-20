@@ -1,29 +1,21 @@
 from rest_framework import serializers
 
-from author.models import Author
-from author.serializers import AuthorSerializerGet, AuthorSerializerPost
-from genre.models import Genre
-from genre.serializers import GenreSerializerGet, GenreSerializerPost
+from author.serializers import AuthorSerializer
+from genre.serializers import GenreSerializer
 from song.models import Song, SongData
 
+from django.db.transaction import atomic
 
-class SongDataSerializerGet(serializers.HyperlinkedModelSerializer):
+
+class SongDataSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = SongData
-        fields = ("data",)
-
-
-class SongDataSerializerPost(serializers.ModelSerializer):
-    id = serializers.IntegerField()
-
-    class Meta:
-        model = SongData
-        fields = ("id",)
+        fields = ("id", "data")
 
 
 class SongSerializerGet(serializers.ModelSerializer):
-    genre = GenreSerializerGet(many=True)
-    author = AuthorSerializerGet(many=True)
+    genre = GenreSerializer(many=True)
+    author = AuthorSerializer(many=True)
     data = serializers.HyperlinkedRelatedField(
         read_only=True,
         view_name="song-data",
@@ -31,35 +23,30 @@ class SongSerializerGet(serializers.ModelSerializer):
 
     class Meta:
         model = Song
-        fields = ("title", "author", "release_date", "genre", "data")
+        fields = ("id", "title", "author", "release_date", "genre", "data")
 
 
 class SongSerializerPost(serializers.ModelSerializer):
-    genre = GenreSerializerPost(many=True)
-    author = AuthorSerializerPost(many=True)
-    data = SongDataSerializerPost()
 
     class Meta:
         model = Song
-        fields = ("title", "author", "genre", "release_date", "data")
+        fields = ("id", "title", "author", "genre", "release_date", "data")
 
+    @atomic
     def create(self, validated_data):
-        genre = validated_data.pop("genre", [])
-        author = validated_data.pop("author", [])
+        genres = validated_data.pop("genre", [])
+        authors = validated_data.pop("author", [])
 
-        data = validated_data.pop("data")
-        data_ = SongData.objects.get(pk=data.get("id"))
-        song = Song.objects.create(data=data_, **validated_data)
+        song = Song.objects.create(**validated_data)
 
-        for current in genre:
-            genre_ = Genre.objects.get(pk=current.get("id"))
-            song.genre.add(genre_)
+        for genre in genres:
+            song.genre.add(genre)
 
-        for current in author:
-            author_ = Author.objects.get(pk=current.get("id"))
-            song.author.add(author_)
+        for author in authors:
+            song.author.add(author)
         return song
 
+    @atomic
     def update(self, instance, validated_data):
         authors = validated_data.get("author")
         genres = validated_data.get("genre")
@@ -71,10 +58,10 @@ class SongSerializerPost(serializers.ModelSerializer):
             instance.genre.clear()
 
             for author in authors:
-                instance.author.add(author['id'])
+                instance.author.add(author)
 
             for genre in genres:
-                instance.genre.add(genre['id'])
+                instance.genre.add(genre)
 
             instance.save()
             return instance

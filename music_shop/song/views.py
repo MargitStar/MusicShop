@@ -4,12 +4,12 @@ from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 
 from song.models import Song, SongData
-from song.serializers import (SongDataSerializerGet, SongSerializerGet,
+from song.serializers import (SongDataSerializer, SongSerializerGet,
                               SongSerializerPost)
 
 
 class SongDataCreateView(viewsets.GenericViewSet, mixins.CreateModelMixin):
-    serializer_class = SongDataSerializerGet
+    serializer_class = SongDataSerializer
     queryset = SongData.objects.all()
 
 
