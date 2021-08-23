@@ -21,7 +21,6 @@ It allows you to:
    * `MUSIC_SHOP_DB_HOST`
    * `MUSIC_SHOP_DB_PORT`
    * `MUSIC_SHOP_SECRET_KEY`
-   * `MUSIC_SHOP_SECRET_KEY`
    * `MUSIC_SHOP_ALLOWED_HOSTS`
 
 example of `.env` file
