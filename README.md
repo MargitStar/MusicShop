@@ -8,7 +8,7 @@ It allows you to:
 2. Upload music
 3. Make playlists
 4. Add music to playlists
-5. Filter music by artist, genres, release date and title
+5. Filter music by artist, genre, release date and title
 
 
 # Installation
