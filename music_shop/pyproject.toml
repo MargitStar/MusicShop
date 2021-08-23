@@ -17,6 +17,7 @@ django-filter = "^2.4.0"
 djangorestframework-simplejwt = "^4.8.0"
 
 [tool.poetry.dev-dependencies]
+drf-yasg = "^1.20.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
