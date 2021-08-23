@@ -25,7 +25,7 @@ It allows you to:
 8. Apply all migrations using `poetry run python manage.py migrate`
 9. Run project using `poetry run python manage.py runserver`
 10. To see documentation of API go to `http://0.0.0.0:8000/swagger/`
-11. No you can start using MusicShop API
+11. Now you can start using MusicShop API
 
 # Support
  You can contact me using email `sovenokbymargo@mail.ru`. I'd be happy to help you
