@@ -14,7 +14,6 @@ It allows you to:
 # Installation
 1. Clone code from GitHub repository https://github.com/MargitStar/MusicShop
 2. Install `Python3`, `Docker`, `PostgreSQL`
-3. Go to `../MusicShop/music_shop`.
 4. Run `docker-compose up -d`
 5. Add `.env` file, that has to include: `MUSIC_SHOP_DB_NAME`,
    `MUSIC_SHOP_DB_USER`, `MUSIC_SHOP_DB_PASSWORD`,
