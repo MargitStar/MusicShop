@@ -1,8 +1,10 @@
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
+from rest_framework.response import Response
 from rest_framework.decorators import action
 
+from playlist.models import Playlist
 from song.models import Song, SongData
 from song.serializers import (SongDataSerializer, SongSerializerGet,
                               SongSerializerPost)
@@ -42,3 +44,11 @@ class SongViewSet(viewsets.ModelViewSet):
             'attachment; filename="%s"' % instance.data.name
         )
         return response
+
+    @action(detail=True, methods=["get"])
+    def playlist(self, request, pk=None, playlist_id=None):
+        song = Song.objects.get(pk=pk)
+        playlist = Playlist.objects.get(pk=playlist_id)
+        playlist.song.add(song)
+        playlist.save()
+        return Response("Added")
