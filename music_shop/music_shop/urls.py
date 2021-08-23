@@ -19,10 +19,11 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path('api/', include('song.urls')),
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("api/", include("song.urls")),
+    path("api/", include("playlist.urls")),
+    path("api/", include("user.urls", namespace="user")),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
