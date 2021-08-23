@@ -1,7 +1,7 @@
-#Name
+# Name
 Music App
 
-#Description
+# Description
 Music App is Django Rest Framework backend.
 It allows you to:
 1. Download music
