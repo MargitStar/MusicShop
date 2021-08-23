@@ -25,7 +25,7 @@ class PlaylistViewSet(ModelViewSet):
         return super(PlaylistViewSet, self).get_permissions()
 
     def get_serializer_class(self):
-        if self.request.method == "GET":
+        if self.request.method == "GET" or self.request.method == "OPTIONS":
             return PlaylistSerializer
         elif self.request.method != "DELETE":
             return PlaylistSerializerPost

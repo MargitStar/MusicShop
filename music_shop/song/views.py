@@ -1,9 +1,10 @@
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from playlist.models import Playlist
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from playlist.models import Playlist
 from song.models import Song, SongData
 from song.serializers import SongDataSerializer, SongSerializerGet, SongSerializerPost
 
@@ -26,7 +27,7 @@ class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
 
     def get_serializer_class(self):
-        if self.request.method == "GET":
+        if self.request.method == "GET" or self.request.method == "OPTIONS":
             return SongSerializerGet
         elif self.request.method != "DELETE":
             return SongSerializerPost
