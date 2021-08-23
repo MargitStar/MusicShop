@@ -1,13 +1,11 @@
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, viewsets
-from rest_framework.response import Response
-from rest_framework.decorators import action
-
 from playlist.models import Playlist
+from rest_framework import filters, mixins, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from song.models import Song, SongData
-from song.serializers import (SongDataSerializer, SongSerializerGet,
-                              SongSerializerPost)
+from song.serializers import SongDataSerializer, SongSerializerGet, SongSerializerPost
 
 
 class SongDataCreateView(viewsets.GenericViewSet, mixins.CreateModelMixin):

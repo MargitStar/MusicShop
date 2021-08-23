@@ -1,10 +1,8 @@
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
-
-
 from playlist.models import Playlist
 from playlist.serializers import PlaylistSerializer, PlaylistSerializerPost
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
 
 class PlaylistViewSet(ModelViewSet):
