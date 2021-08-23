@@ -34,7 +34,8 @@ MY_APPS = [
     'genre',
     'author',
     'song',
-    'user'
+    'user',
+    'playlist'
 ]
 
 THIRD_PARTY_APPS = [
