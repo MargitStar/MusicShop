@@ -31,8 +31,9 @@ class TestSongEndpoints:
         assert len(json.loads(response.content)) == 3
 
     def test_create(self, api_client, create_data):
-        song = baker.make(Song)
+        song = baker.prepare(Song)
         song_data, genre, author = create_data
+        assert not Song.objects.filter(pk=song.pk)
         expected_json = {
             "title": song.title,
             "author": [author.id],
@@ -44,6 +45,7 @@ class TestSongEndpoints:
         response = api_client().post(self.endpoint, data=expected_json, format="json")
 
         assert response.status_code == 201
+        assert Song.objects.filter(pk=response.data["id"])
 
     def test_retrieve(self, api_client):
         song = baker.make(Song)
