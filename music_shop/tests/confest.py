@@ -2,6 +2,7 @@ from datetime import date
 
 import pytest
 from django.contrib.auth import get_user_model
+from model_bakery import baker
 from rest_framework.test import APIClient
 
 from author.models import Author
@@ -30,18 +31,18 @@ def get_token():
 
 @pytest.fixture
 def create_data():
-    author = Author.objects.create(name="gleb", surname="hleb")
-    genre = Genre.objects.create(name="lal", description="pal")
-    song_data = SongData.objects.create(data="music/ed-sheeran_perfect.mp3")
+    author = baker.make(Author)
+    genre = baker.make(Genre)
+    song_data = baker.make(SongData, _create_files=True)
     return song_data, genre, author
 
 
 @pytest.fixture
 def create_song():
-    author = Author.objects.create(name="gleb", surname="hleb")
-    genre = Genre.objects.create(name="lal", description="pal")
-    song_data = SongData.objects.create(data="music/ed-sheeran_perfect.mp3")
-    song = Song.objects.create(title="lala", release_date=date.today(), data=song_data)
+    author = baker.make(Author)
+    genre = baker.make(Genre)
+    data = baker.make(SongData, _create_files=True)
+    song = baker.make(Song)
     song.genre.add(genre)
     song.author.add(author)
     song.save()
