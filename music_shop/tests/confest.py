@@ -20,7 +20,7 @@ def create_test_user():
     return user
 
 
-@pytest.mark.django_db
+@pytest.fixture
 def create_data():
     author = Author.objects.create(name="gleb", surname="hleb")
     genre = Genre.objects.create(name="lal", description="pal")
