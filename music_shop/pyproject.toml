@@ -18,6 +18,9 @@ djangorestframework-simplejwt = "^4.8.0"
 
 [tool.poetry.dev-dependencies]
 drf-yasg = "^1.20.0"
+factory-boy = "^3.2.0"
+model-bakery = "^1.3.2"
+pytest-django = "^4.4.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

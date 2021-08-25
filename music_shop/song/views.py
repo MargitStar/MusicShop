@@ -1,6 +1,6 @@
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, viewsets
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -48,6 +48,9 @@ class SongViewSet(viewsets.ModelViewSet):
     def playlist(self, request, pk=None, playlist_id=None):
         song = Song.objects.get(pk=pk)
         playlist = Playlist.objects.get(pk=playlist_id)
-        playlist.song.add(song)
-        playlist.save()
-        return Response("Added")
+        if self.request.user == playlist.user:
+            playlist.song.add(song)
+            playlist.save()
+            return Response("Added")
+        else:
+            return Response("It is not your playlist", status=status.HTTP_403_FORBIDDEN)
