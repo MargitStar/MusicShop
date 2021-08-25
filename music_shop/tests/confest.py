@@ -14,10 +14,15 @@ def api_client():
     return APIClient
 
 
-@pytest.mark.django_db
-def create_test_user():
-    user = User.objects.create_user(username="Star", password="star")
-    return user
+@pytest.fixture
+def get_token():
+    def g_t(client):
+        User.objects.create_user(username="Star", password="star")
+        token_url = "/api/token/"
+        token = client.post(token_url, {"username": "Star", "password": "star"})
+        client.credentials(HTTP_AUTHORIZATION="Bearer " + token.data["access"])
+
+    return g_t
 
 
 @pytest.fixture

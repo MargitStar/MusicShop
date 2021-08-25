@@ -5,7 +5,7 @@ from model_bakery import baker
 
 from playlist.models import Playlist
 
-from ..confest import api_client, create_test_user
+from ..confest import api_client, get_token
 
 pytestmark = pytest.mark.django_db
 
@@ -22,16 +22,13 @@ class TestPlaylistEndpoints:
         assert response.status_code == 200
         assert len(json.loads(response.content)) == 3
 
-    def test_delete(self, api_client):
+    def test_delete(self, api_client, get_token):
         playlist = baker.make(Playlist)
-
-        create_test_user()
-        token_url = "/api/token/"
-        token = api_client().post(token_url, {"username": "Star", "password": "star"})
-
         client = api_client()
+        get_token(client)
+
         url = f"{self.endpoint}{playlist.id}/"
-        client.credentials(HTTP_AUTHORIZATION="Bearer " + token.data["access"])
+
         response = client.delete(url)
 
         assert response.status_code == 204
