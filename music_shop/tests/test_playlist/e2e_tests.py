@@ -31,14 +31,16 @@ class TestPlaylistEndpoints:
 
     def test_create(self, api_client, get_token, create_song):
         playlist = baker.prepare(Playlist)
-        assert not Playlist.objects.filter(pk=playlist.pk)
+        count = Playlist.objects.count()
 
         expected_json = {"name": playlist.name, "song": [create_song.id]}
 
         client = api_client()
         get_token(client)
         response = client.post(self.endpoint, data=expected_json, format="json")
+
         assert response.status_code == 201
+        assert Playlist.objects.count() == count + 1
         assert Playlist.objects.filter(pk=response.data["id"])
 
     def test_update(self, api_client, get_token, create_song):
