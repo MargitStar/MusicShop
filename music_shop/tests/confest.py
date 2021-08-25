@@ -45,5 +45,6 @@ def create_song():
     song = baker.make(Song)
     song.genre.add(genre)
     song.author.add(author)
+    song.data = data
     song.save()
     return song
