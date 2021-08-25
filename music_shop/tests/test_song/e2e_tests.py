@@ -73,9 +73,9 @@ class TestSongEndpoints:
 
     def test_delete(self, api_client):
         song = baker.make(Song)
-        url = f"{self.endpoint}{song.id}/"
+        url = f"{self.endpoint}{song.pk}/"
 
         response = api_client().delete(url)
 
         assert response.status_code == 204
-        assert Song.objects.all().count() == 0
+        assert not Song.objects.filter(pk=song.pk)

@@ -18,13 +18,14 @@ def api_client():
 
 @pytest.fixture
 def get_token():
-    def g_t(client):
+    def _get_token(client):
         User.objects.create_user(username="Star", password="star")
         token_url = "/api/token/"
         token = client.post(token_url, {"username": "Star", "password": "star"})
         client.credentials(HTTP_AUTHORIZATION="Bearer " + token.data["access"])
+        return token
 
-    return g_t
+    return _get_token
 
 
 @pytest.fixture

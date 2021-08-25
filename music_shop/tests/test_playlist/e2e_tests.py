@@ -31,8 +31,8 @@ class TestPlaylistEndpoints:
 
     def test_create(self, api_client, get_token, create_song):
         playlist = baker.make(Playlist)
-        song = create_song
-        expected_json = {"name": playlist.name, "song": [song.id]}
+        expected_json = {"name": playlist.name, "song": [create_song.id]}
+
         client = api_client()
         get_token(client)
         response = client.post(self.endpoint, data=expected_json, format="json")
@@ -42,8 +42,8 @@ class TestPlaylistEndpoints:
     def test_update(self, api_client, get_token, create_song):
         old_playlist = baker.make(Playlist)
         new_playlist = baker.prepare(Playlist)
-        song = create_song
-        playlist_dict = {"name": new_playlist.name, "song": [song.id]}
+
+        playlist_dict = {"name": new_playlist.name, "song": [create_song.id]}
 
         url = f"{self.endpoint}{old_playlist.id}/"
 
@@ -60,9 +60,9 @@ class TestPlaylistEndpoints:
         client = api_client()
         get_token(client)
 
-        url = f"{self.endpoint}{playlist.id}/"
+        url = f"{self.endpoint}{playlist.pk}/"
 
         response = client.delete(url)
 
         assert response.status_code == 204
-        assert Playlist.objects.all().count() == 0
+        assert not Playlist.objects.filter(pk=playlist.pk)
