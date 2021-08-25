@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -15,7 +16,7 @@ class PlaylistViewSet(ModelViewSet):
         serializer = PlaylistSerializerPost(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(user=self.request.user)
-            return Response("Created")
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_permissions(self):
         if self.request.method == "GET" or self.request.method == "OPTIONS":

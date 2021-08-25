@@ -68,7 +68,6 @@ class TestSongEndpoints:
         url = f"{self.endpoint}{old_song.id}/"
 
         response = api_client().put(url, song_dict, format="json")
-
         assert response.status_code == 200
         assert json.loads(response.content) == song_dict
 
