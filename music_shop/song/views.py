@@ -1,12 +1,18 @@
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, status, viewsets
+from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from playlist.models import Playlist
-from song.models import Song, SongData
-from song.serializers import SongDataSerializer, SongSerializerGet, SongSerializerPost
+from song.models import BlockedSong, Song, SongData
+from song.serializers import (
+    BlockedSongSerializerGet,
+    BlockedSongSerializerPost,
+    SongDataSerializer,
+    SongSerializerGet,
+    SongSerializerPost,
+)
 
 
 class SongDataCreateView(viewsets.GenericViewSet, mixins.CreateModelMixin):
@@ -54,3 +60,34 @@ class SongViewSet(viewsets.ModelViewSet):
             return Response("Added")
         else:
             return Response("It is not your playlist", status=status.HTTP_403_FORBIDDEN)
+
+    @action(
+        detail=True, methods=["put"], permission_classes=(permissions.IsAuthenticated,)
+    )
+    def blocked(self, request, pk=None):
+        song = Song.objects.get(pk=pk)
+        user = self.request.user
+        blocked_song = BlockedSong.objects.filter(song=song)
+        if blocked_song:
+            serializer = BlockedSongSerializerPost(
+                blocked_song.first(), data=request.data
+            )
+        else:
+            serializer = BlockedSongSerializerPost(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save(song=song, user=user)
+        if not blocked_song:
+            return Response(
+                f"{song.title} is in blacklist now!", status=status.HTTP_201_CREATED
+            )
+        else:
+            return Response(
+                f"{song.title} is in blacklist now", status=status.HTTP_200_OK
+            )
+
+
+class BlockedSongViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = BlockedSong.objects.all()
+    serializer_class = BlockedSongSerializerGet
