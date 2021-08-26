@@ -1,5 +1,6 @@
-from playlist.models import Playlist
 from rest_framework import serializers
+
+from playlist.models import Playlist
 from song.serializers import SongSerializerGet
 
 
@@ -14,4 +15,4 @@ class PlaylistSerializer(serializers.ModelSerializer):
 class PlaylistSerializerPost(serializers.ModelSerializer):
     class Meta:
         model = Playlist
-        fields = ("name", "song")
+        fields = ("id", "name", "song")
