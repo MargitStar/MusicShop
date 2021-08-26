@@ -9,10 +9,6 @@ from playlist.serializers import PlaylistSerializer, PlaylistSerializerPost
 
 
 class PlaylistViewSet(ViewSet):
-    # permission_classes = (IsAuthenticated,)
-    # queryset = Playlist.objects.all()
-    # serializer_class = PlaylistSerializer
-
     def list(self, request, *args, **kwargs):
         queryset = Playlist.objects.all()
         serializer = PlaylistSerializer(queryset, many=True)
@@ -62,9 +58,3 @@ class PlaylistViewSet(ViewSet):
         else:
             self.permission_classes = (IsAuthenticated,)
         return super(PlaylistViewSet, self).get_permissions()
-
-    def get_serializer_class(self):
-        if self.request.method == "GET" or self.request.method == "OPTIONS":
-            return PlaylistSerializer
-        elif self.request.method != "DELETE":
-            return PlaylistSerializerPost
