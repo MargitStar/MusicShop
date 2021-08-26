@@ -62,20 +62,17 @@ class SongViewSet(viewsets.ModelViewSet):
             return Response("It is not your playlist", status=status.HTTP_403_FORBIDDEN)
 
     @action(
-        detail=True, methods=["post"], permission_classes=(permissions.IsAuthenticated,)
+        detail=True, methods=["put"], permission_classes=(permissions.IsAuthenticated,)
     )
     def blocked(self, request, pk=None):
         song = Song.objects.get(pk=pk)
-        blocked_song = BlockedSong.objects.all()
         user = self.request.user
-        if blocked_song.filter(song=song.pk).exists():
-            return Response(
-                f"This song {song.title} has been already added to blacklist!"
-            )
         serializer = BlockedSongSerializerPost(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save(user=user, song=song)
-            return Response(f"{song.title} is in blacklist now!")
+            return Response(
+                f"{song.title} is in blacklist now!", status=status.HTTP_201_CREATED
+            )
 
 
 class BlockedSongViewSet(viewsets.ReadOnlyModelViewSet):
