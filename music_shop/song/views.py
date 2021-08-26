@@ -1,12 +1,18 @@
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, status, viewsets
+from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from playlist.models import Playlist
-from song.models import Song, SongData
-from song.serializers import SongDataSerializer, SongSerializerGet, SongSerializerPost
+from song.models import BlockedSong, Song, SongData
+from song.serializers import (
+    BlockedSongSerializerGet,
+    BlockedSongSerializerPost,
+    SongDataSerializer,
+    SongSerializerGet,
+    SongSerializerPost,
+)
 
 
 class SongDataCreateView(viewsets.GenericViewSet, mixins.CreateModelMixin):
@@ -54,3 +60,25 @@ class SongViewSet(viewsets.ModelViewSet):
             return Response("Added")
         else:
             return Response("It is not your playlist", status=status.HTTP_403_FORBIDDEN)
+
+    @action(
+        detail=True, methods=["post"], permission_classes=(permissions.IsAuthenticated,)
+    )
+    def blocked(self, request, pk=None):
+        song = Song.objects.get(pk=pk)
+        blocked_song = BlockedSong.objects.all()
+        user = self.request.user
+        if blocked_song.filter(song=song.pk).exists():
+            return Response(
+                f"This song {song.title} has been already added to blacklist!"
+            )
+        serializer = BlockedSongSerializerPost(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=user, song=song)
+            return Response(f"{song.title} is in blacklist now!")
+
+
+class BlockedSongViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = BlockedSong.objects.all()
+    serializer_class = BlockedSongSerializerGet
