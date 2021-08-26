@@ -108,7 +108,6 @@ class TestSongEndpoints:
         data = {"comment": new_blocked_song.comment}
 
         response = client.put(url, data=data, format="json")
-        print(response.data)
 
         assert response.status_code == 200
 
