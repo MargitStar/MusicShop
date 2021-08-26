@@ -1,7 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from author.models import Author
 from genre.models import Genre
+
+User = get_user_model()
 
 
 class SongData(models.Model):
@@ -20,3 +23,12 @@ class Song(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class BlockedSong(models.Model):
+    song = models.OneToOneField(Song, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.TextField(max_length=500)
+
+    def __str__(self):
+        return f"Blocked {self.song.title}"
