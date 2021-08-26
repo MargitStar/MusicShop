@@ -63,25 +63,6 @@ class TestPlaylistEndpoints:
         assert response.status_code == 200
         assert json.loads(response.content) == playlist_dict
 
-    @pytest.mark.parametrize("field", ["name", "song"])
-    def test_partial_update(self, field, api_client, create_song, get_token):
-        playlist = baker.make(Playlist)
-        playlist_dict = {
-            "id": playlist.id,
-            "name": playlist.name,
-            "song": [create_song.id],
-        }
-        client = api_client()
-        get_token(client)
-
-        valid_field = playlist_dict[field]
-        url = f"{self.endpoint}{playlist.id}/"
-
-        response = client.patch(url, {field: valid_field}, format="json")
-
-        assert response.status_code == 200
-        assert json.loads(response.content)[field] == valid_field
-
     def test_delete(self, api_client, get_token):
         playlist = baker.make(Playlist)
         assert Playlist.objects.filter(pk=playlist.pk)

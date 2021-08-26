@@ -42,10 +42,6 @@ class PlaylistViewSet(ViewSet):
         else:
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def partial_update(self, request, *args, **kwargs):
-        kwargs["partial"] = True
-        return self.update(request, *args, **kwargs)
-
     def destroy(self, request, pk=None):
         queryset = Playlist.objects.all()
         playlist = get_object_or_404(queryset, pk=pk)
