@@ -74,16 +74,17 @@ class SongViewSet(viewsets.ModelViewSet):
             )
         else:
             serializer = BlockedSongSerializerPost(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(song=song, user=user)
-            if not blocked_song:
-                return Response(
-                    f"{song.title} is in blacklist now!", status=status.HTTP_201_CREATED
-                )
-            else:
-                return Response(
-                    f"{song.title} is in blacklist now", status=status.HTTP_200_OK
-                )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save(song=song, user=user)
+        if not blocked_song:
+            return Response(
+                f"{song.title} is in blacklist now!", status=status.HTTP_201_CREATED
+            )
+        else:
+            return Response(
+                f"{song.title} is in blacklist now", status=status.HTTP_200_OK
+            )
 
 
 class BlockedSongViewSet(viewsets.ReadOnlyModelViewSet):
