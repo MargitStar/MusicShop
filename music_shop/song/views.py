@@ -61,7 +61,7 @@ class SongViewSet(viewsets.ViewSet):
         else:
             serializer = SongSerializerPost(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=self.request.user)
+        serializer.save()
         if queryset:
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
