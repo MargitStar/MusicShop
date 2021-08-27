@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from playlist.models import Playlist
+from song.filters import SongFilter
 from song.models import BlockedSong, Song, SongData
 from song.serializers import (
     BlockedSongSerializerGet,
@@ -22,21 +23,10 @@ class SongDataCreateView(viewsets.GenericViewSet, mixins.CreateModelMixin):
 
 
 class SongViewSet(viewsets.ViewSet):
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = (
-        "release_date",
-        "author__name",
-        "author__surname",
-        "title",
-        "genre__name",
-    )
-    search_fields = ["^title"]
-
     def list(self, request, *args, **kwargs):
         queryset = Song.objects.all()
-        serializer = SongSerializerGet(
-            queryset, many=True, context={"request": request}
-        )
+        fil = SongFilter(request.GET, queryset=queryset)
+        serializer = SongSerializerGet(fil.qs, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
