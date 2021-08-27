@@ -93,11 +93,15 @@ class BlockedSongViewSet(viewsets.ViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = BlockedSong.objects.all()
-        serializer = BlockedSongSerializerGet(queryset, many=True)
+        serializer = BlockedSongSerializerGet(
+            queryset, many=True, context={"request": request}
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
         queryset = BlockedSong.objects.all()
         blocked_song = get_object_or_404(queryset, pk=pk)
-        serializer = BlockedSongSerializerGet(blocked_song)
+        serializer = BlockedSongSerializerGet(
+            blocked_song, context={"request": request}
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
