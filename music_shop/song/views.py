@@ -1,4 +1,5 @@
 from django.http import FileResponse
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -87,7 +88,20 @@ class SongViewSet(viewsets.ModelViewSet):
             )
 
 
-class BlockedSongViewSet(viewsets.ReadOnlyModelViewSet):
+class BlockedSongViewSet(viewsets.ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
-    queryset = BlockedSong.objects.all()
-    serializer_class = BlockedSongSerializerGet
+
+    def list(self, request, *args, **kwargs):
+        queryset = BlockedSong.objects.all()
+        serializer = BlockedSongSerializerGet(
+            queryset, many=True, context={"request": request}
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, pk=None):
+        queryset = BlockedSong.objects.all()
+        blocked_song = get_object_or_404(queryset, pk=pk)
+        serializer = BlockedSongSerializerGet(
+            blocked_song, context={"request": request}
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
