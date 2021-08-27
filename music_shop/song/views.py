@@ -1,4 +1,5 @@
 from django.http import FileResponse
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -20,7 +21,7 @@ class SongDataCreateView(viewsets.GenericViewSet, mixins.CreateModelMixin):
     queryset = SongData.objects.all()
 
 
-class SongViewSet(viewsets.ModelViewSet):
+class SongViewSet(viewsets.ViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = (
         "release_date",
@@ -30,7 +31,47 @@ class SongViewSet(viewsets.ModelViewSet):
         "genre__name",
     )
     search_fields = ["^title"]
-    queryset = Song.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = Song.objects.all()
+        serializer = SongSerializerGet(
+            queryset, many=True, context={"request": request}
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, pk=None):
+        queryset = Song.objects.all()
+        playlist = get_object_or_404(queryset, pk=pk)
+        serializer = SongSerializerGet(playlist, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        serializer = SongSerializerPost(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        queryset = Song.objects.filter(pk=kwargs["pk"])
+        if queryset:
+            serializer = SongSerializerPost(
+                queryset.first(), data=request.data, partial=partial
+            )
+        else:
+            serializer = SongSerializerPost(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=self.request.user)
+        if queryset:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk=None):
+        queryset = Song.objects.all()
+        song = get_object_or_404(queryset, pk=pk)
+        song.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_serializer_class(self):
         if self.request.method == "GET" or self.request.method == "OPTIONS":
