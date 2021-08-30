@@ -1,13 +1,13 @@
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from playlist.models import Playlist
 from song.filters import SongFilter
 from song.models import BlockedSong, Song, SongData
+from song.permissions import ModeratorPermission
 from song.serializers import (
     BlockedSongSerializerGet,
     BlockedSongSerializerPost,
@@ -81,7 +81,9 @@ class SongViewSet(viewsets.ViewSet):
         )
         return response
 
-    @action(detail=True, methods=["get"])
+    @action(
+        detail=True, methods=["get"], permission_classes=(permissions.IsAuthenticated,)
+    )
     def playlist(self, request, pk=None, playlist_id=None):
         song = Song.objects.get(pk=pk)
         playlist = Playlist.objects.get(pk=playlist_id)
@@ -92,9 +94,7 @@ class SongViewSet(viewsets.ViewSet):
         else:
             return Response("It is not your playlist", status=status.HTTP_403_FORBIDDEN)
 
-    @action(
-        detail=True, methods=["put"], permission_classes=(permissions.IsAuthenticated,)
-    )
+    @action(detail=True, methods=["put"], permission_classes=(ModeratorPermission,))
     def blocked(self, request, pk=None):
         song = Song.objects.get(pk=pk)
         user = self.request.user
@@ -119,7 +119,7 @@ class SongViewSet(viewsets.ViewSet):
 
 
 class BlockedSongViewSet(viewsets.ViewSet):
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (ModeratorPermission,)
 
     def list(self, request, *args, **kwargs):
         queryset = BlockedSong.objects.all()
