@@ -11,13 +11,15 @@ from playlist.serializers import PlaylistSerializer, PlaylistSerializerPost
 class PlaylistViewSet(ViewSet):
     def list(self, request, *args, **kwargs):
         queryset = Playlist.objects.all()
-        serializer = PlaylistSerializer(queryset, many=True)
+        serializer = PlaylistSerializer(
+            queryset, many=True, context={"request": request}
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
         queryset = Playlist.objects.all()
         playlist = get_object_or_404(queryset, pk=pk)
-        serializer = PlaylistSerializer(playlist)
+        serializer = PlaylistSerializer(playlist, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
