@@ -39,7 +39,7 @@ def create_data():
 
 @pytest.fixture
 def create_song():
-    author = baker.make(Author)
+    author = baker.make(Author, surname="foo")
     genre = baker.make(Genre)
     data = baker.make(SongData, _create_files=True)
     song = baker.make(Song)

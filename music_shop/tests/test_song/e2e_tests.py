@@ -5,7 +5,7 @@ from model_bakery import baker
 
 from song.models import BlockedSong, Song, SongData
 
-from ..confest import api_client, create_data, get_token
+from ..confest import api_client, create_data, create_song, get_token
 
 pytestmark = pytest.mark.django_db
 
@@ -29,6 +29,56 @@ class TestSongEndpoints:
 
         assert response.status_code == 200
         assert len(json.loads(response.content)) == 3
+
+    def test_filter_author_name(self, api_client, create_song):
+        song = create_song
+        author_name = song.author.all()[0].name
+        url = f"{self.endpoint}?author_name={author_name}"
+
+        response = api_client().get(url)
+
+        assert response.status_code == 200
+        assert len(json.loads(response.content)) == 1
+
+    def test_filter_author_surname(self, api_client, create_song):
+        song = create_song
+        author_surname = song.author.all()[0].surname
+        url = f"{self.endpoint}?author_surname={author_surname}"
+
+        response = api_client().get(url)
+
+        assert response.status_code == 200
+        assert len(json.loads(response.content)) == 1
+
+    def test_filter_title(self, api_client, create_song):
+        song = create_song
+        title = song.title
+        url = f"{self.endpoint}?title={title}"
+
+        response = api_client().get(url)
+
+        assert response.status_code == 200
+        assert len(json.loads(response.content)) == 1
+
+    def test_filter_genre(self, api_client, create_song):
+        song = create_song
+        genre_name = song.genre.all()[0].name
+        url = f"{self.endpoint}?genre={genre_name}"
+
+        response = api_client().get(url)
+
+        assert response.status_code == 200
+        assert len(json.loads(response.content)) == 1
+
+    def test_filter_release_date(self, api_client, create_song):
+        song = create_song
+        release_date = song.release_date
+        url = f"{self.endpoint}?release_date={release_date}"
+
+        response = api_client().get(url)
+
+        assert response.status_code == 200
+        assert len(json.loads(response.content)) == 1
 
     def test_create(self, api_client, create_data):
         song = baker.prepare(Song)
