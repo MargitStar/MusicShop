@@ -20,6 +20,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(validated_data["password"])
         user.save()
 
-        group, created = Group.objects.get_or_create(name="User")
+        group = Group.objects.get(name="User")
         group.user_set.add(user)
         return user
