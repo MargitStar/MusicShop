@@ -135,3 +135,9 @@ class BlockedSongViewSet(viewsets.ViewSet):
             blocked_song, context={"request": request}
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, pk=None):
+        queryset = BlockedSong.objects.all()
+        song = get_object_or_404(queryset, pk=pk)
+        song.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
