@@ -108,6 +108,8 @@ class SongViewSet(viewsets.ViewSet):
 
         serializer.is_valid(raise_exception=True)
         serializer.save(song=song, user=user)
+        song.blocked = True
+        song.save()
         if not blocked_song:
             return Response(
                 f"{song.title} is in blacklist now!", status=status.HTTP_201_CREATED
@@ -138,6 +140,8 @@ class BlockedSongViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         queryset = BlockedSong.objects.all()
-        song = get_object_or_404(queryset, pk=pk)
-        song.delete()
+        blocked_song = get_object_or_404(queryset, pk=pk)
+        blocked_song.song.blocked = False
+        blocked_song.song.save()
+        blocked_song.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
