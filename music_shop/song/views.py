@@ -90,10 +90,9 @@ class SongViewSet(viewsets.ViewSet):
             song = self.get_queryset().get(pk=pk)
         except ObjectDoesNotExist:
             return Response("This song does not exist!")
-        try:
-            playlist = Playlist.objects.get(pk=playlist_id)
-        except ObjectDoesNotExist:
-            return Response("This playlist does not exist!")
+
+        playlist = get_object_or_404(Playlist.objects.all(), pk=playlist_id)
+
         if self.request.user == playlist.user:
             playlist.song.add(song)
             playlist.save()
