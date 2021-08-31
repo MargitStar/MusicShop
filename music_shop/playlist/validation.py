@@ -6,7 +6,7 @@ from song.models import Song
 
 
 def validate_songs(request):
-    songs_pk = copy.deepcopy(request.data["song"])
+    songs_pk = copy.copy(request.data["song"])
     request.data["song"].clear()
     if songs_pk:
         for pk in songs_pk:
