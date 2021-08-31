@@ -56,7 +56,9 @@ class PlaylistViewSet(ViewSet):
             playlist.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
-            return Response("This is not your playlist")
+            return Response(
+                "This is not your playlist", status=status.HTTP_403_FORBIDDEN
+            )
 
     def get_permissions(self):
         if self.request.method == "GET" or self.request.method == "OPTIONS":
