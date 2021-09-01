@@ -33,6 +33,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("song.urls")),
     path("api/", include("playlist.urls")),
+    path("api/", include("collection.urls")),
     path("api/", include("user.urls", namespace="user")),
     path(
         "swagger/",
