@@ -30,7 +30,7 @@ ALLOWED_HOSTS = os.environ["MUSIC_SHOP_ALLOWED_HOSTS"].split(",")
 
 # Application definition
 
-MY_APPS = ["genre", "author", "song", "user", "playlist"]
+MY_APPS = ["genre", "author", "song", "user", "playlist", "collection"]
 
 THIRD_PARTY_APPS = ["rest_framework", "django_filters", "drf_yasg"]
 
