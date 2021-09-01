@@ -34,6 +34,7 @@ urlpatterns = [
     path("api/", include("song.urls")),
     path("api/", include("playlist.urls")),
     path("api/", include("genre.urls")),
+    path("api/", include("author.urls")),
     path("api/", include("user.urls", namespace="user")),
     path(
         "swagger/",
