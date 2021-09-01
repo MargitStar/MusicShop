@@ -1,3 +1,4 @@
+from django.db.models import ObjectDoesNotExist
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, permissions, status, viewsets
@@ -23,15 +24,16 @@ class SongDataCreateView(viewsets.GenericViewSet, mixins.CreateModelMixin):
 
 
 class SongViewSet(viewsets.ViewSet):
+    def get_queryset(self):
+        return Song.objects.filter(blocked=False)
+
     def list(self, request, *args, **kwargs):
-        queryset = Song.objects.all()
-        fil = SongFilter(request.GET, queryset=queryset)
+        fil = SongFilter(request.GET, queryset=self.get_queryset())
         serializer = SongSerializerGet(fil.qs, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        queryset = Song.objects.all()
-        playlist = get_object_or_404(queryset, pk=pk)
+        playlist = get_object_or_404(self.get_queryset(), pk=pk)
         serializer = SongSerializerGet(playlist, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -43,7 +45,7 @@ class SongViewSet(viewsets.ViewSet):
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
-        queryset = Song.objects.filter(pk=kwargs["pk"])
+        queryset = self.get_queryset().filter(pk=kwargs["pk"])
         if queryset:
             serializer = SongSerializerPost(
                 queryset.first(), data=request.data, partial=partial
@@ -58,8 +60,7 @@ class SongViewSet(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
-        queryset = Song.objects.all()
-        song = get_object_or_404(queryset, pk=pk)
+        song = get_object_or_404(self.get_queryset(), pk=pk)
         song.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -85,8 +86,13 @@ class SongViewSet(viewsets.ViewSet):
         detail=True, methods=["get"], permission_classes=(permissions.IsAuthenticated,)
     )
     def playlist(self, request, pk=None, playlist_id=None):
-        song = Song.objects.get(pk=pk)
-        playlist = Playlist.objects.get(pk=playlist_id)
+        try:
+            song = self.get_queryset().get(pk=pk)
+        except ObjectDoesNotExist:
+            return Response("This song does not exist!")
+
+        playlist = get_object_or_404(Playlist.objects.all(), pk=playlist_id)
+
         if self.request.user == playlist.user:
             playlist.song.add(song)
             playlist.save()
@@ -108,6 +114,8 @@ class SongViewSet(viewsets.ViewSet):
 
         serializer.is_valid(raise_exception=True)
         serializer.save(song=song, user=user)
+        song.blocked = True
+        song.save()
         if not blocked_song:
             return Response(
                 f"{song.title} is in blacklist now!", status=status.HTTP_201_CREATED
@@ -135,3 +143,11 @@ class BlockedSongViewSet(viewsets.ViewSet):
             blocked_song, context={"request": request}
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, pk=None):
+        queryset = BlockedSong.objects.all()
+        blocked_song = get_object_or_404(queryset, pk=pk)
+        blocked_song.song.blocked = False
+        blocked_song.song.save()
+        blocked_song.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

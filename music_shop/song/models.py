@@ -20,6 +20,7 @@ class Song(models.Model):
     release_date = models.DateField()
     genre = models.ManyToManyField(Genre)
     data = models.OneToOneField(SongData, on_delete=models.CASCADE, verbose_name="song")
+    blocked = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

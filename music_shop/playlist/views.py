@@ -6,6 +6,7 @@ from rest_framework.viewsets import ViewSet
 
 from playlist.models import Playlist
 from playlist.serializers import PlaylistSerializer, PlaylistSerializerPost
+from playlist.validation import validate_songs
 
 
 class PlaylistViewSet(ViewSet):
@@ -23,6 +24,7 @@ class PlaylistViewSet(ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
+        validate_songs(request)
         serializer = PlaylistSerializerPost(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(user=self.request.user)
@@ -31,6 +33,8 @@ class PlaylistViewSet(ViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         queryset = Playlist.objects.filter(pk=kwargs["pk"])
+        validate_songs(request)
+
         if queryset:
             serializer = PlaylistSerializerPost(
                 queryset.first(), data=request.data, partial=partial
@@ -45,10 +49,16 @@ class PlaylistViewSet(ViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
+        user = self.request.user
         queryset = Playlist.objects.all()
         playlist = get_object_or_404(queryset, pk=pk)
-        playlist.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if user == playlist.user:
+            playlist.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(
+                "This is not your playlist", status=status.HTTP_403_FORBIDDEN
+            )
 
     def get_permissions(self):
         if self.request.method == "GET" or self.request.method == "OPTIONS":
