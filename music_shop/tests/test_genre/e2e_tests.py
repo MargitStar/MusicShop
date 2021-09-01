@@ -23,13 +23,13 @@ class TestGenreEndpoints:
         assert len(json.loads(response.content)) == 3
 
     def test_retrieve(self, api_client):
-        playlist = baker.make(Genre)
-        url = f"{self.endpoint}{playlist.id}/"
+        genre = baker.make(Genre)
+        url = f"{self.endpoint}{genre.id}/"
 
         expected_json = {
-            "id": playlist.id,
-            "name": playlist.name,
-            "description": playlist.description,
+            "id": genre.id,
+            "name": genre.name,
+            "description": genre.description,
         }
 
         response = api_client().get(url)
