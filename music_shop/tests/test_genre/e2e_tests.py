@@ -10,7 +10,7 @@ from ..confest import api_client
 pytestmark = pytest.mark.django_db
 
 
-class TestPlaylistEndpoints:
+class TestGenreEndpoints:
 
     endpoint = "/api/genres/"
 
