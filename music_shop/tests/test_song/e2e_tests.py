@@ -5,7 +5,13 @@ from model_bakery import baker
 
 from song.models import BlockedSong, Song, SongData
 
-from ..confest import api_client, create_data, create_song, get_token
+from ..confest import (
+    api_client,
+    create_data,
+    create_song,
+    get_moderator_token,
+    get_token,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -133,27 +139,27 @@ class TestSongEndpoints:
         assert response.status_code == 204
         assert not Song.objects.filter(pk=song.pk)
 
-    def test_blocked_201(self, api_client, get_token):
+    def test_blocked_201(self, api_client, get_moderator_token):
         song = baker.make(Song)
         blocked_song = baker.prepare(BlockedSong)
         blocked_song.song = song
         url = f"{self.endpoint}{song.pk}/blocked/"
         client = api_client()
-        get_token(client)
+        get_moderator_token(client)
         data = {"comment": blocked_song.comment}
 
         response = client.put(url, data, format="json")
 
         assert response.status_code == 201
 
-    def test_blocked_200(self, api_client, get_token):
+    def test_blocked_200(self, api_client, get_moderator_token):
         song = baker.make(Song)
         baker.make(BlockedSong, song=song)
         new_blocked_song = baker.prepare(BlockedSong)
 
         url = f"{self.endpoint}{song.pk}/blocked/"
         client = api_client()
-        get_token(client)
+        get_moderator_token(client)
 
         data = {"comment": new_blocked_song.comment}
 
@@ -163,19 +169,25 @@ class TestSongEndpoints:
 
 
 class TestBlockedSongEndpoints:
-    endpoint = "/api/songs/"
+    endpoint = "/api/blocked-songs/"
 
-    def test_list(self, api_client):
+    def test_list(self, api_client, get_moderator_token):
         baker.make(BlockedSong, _quantity=3)
 
-        response = api_client().get(self.endpoint)
+        client = api_client()
+        get_moderator_token(client)
+
+        response = client.get(self.endpoint)
 
         assert response.status_code == 200
         assert len(json.loads(response.content)) == 3
 
-    def test_retrieve(self, api_client):
+    def test_retrieve(self, api_client, get_moderator_token):
         blocked_song = baker.make(BlockedSong)
         url = f"{self.endpoint}{blocked_song.id}/"
 
-        response = api_client().get(url)
+        client = api_client()
+        get_moderator_token(client)
+
+        response = client.get(url)
         assert response.status_code == 200

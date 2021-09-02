@@ -1,7 +1,6 @@
-from datetime import date
-
 import pytest
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from model_bakery import baker
 from rest_framework.test import APIClient
 
@@ -27,6 +26,20 @@ def get_token():
         return token
 
     return _get_token
+
+
+@pytest.fixture
+def get_moderator_token():
+    def _get_moderator_token(client):
+        user = User.objects.create_user(username="Star", password="star")
+        group, created = Group.objects.get_or_create(name="Moderator")
+        group.user_set.add(user)
+        token_url = "/api/token/"
+        token = client.post(token_url, {"username": "Star", "password": "star"})
+        client.credentials(HTTP_AUTHORIZATION="Bearer " + token.data["access"])
+        return token
+
+    return _get_moderator_token
 
 
 @pytest.fixture
