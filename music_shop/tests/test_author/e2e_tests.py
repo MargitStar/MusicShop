@@ -22,7 +22,7 @@ class TestAuthorEndpoints:
         assert response.status_code == 200
         assert len(json.loads(response.content)) == 3
 
-    def test_retrieve_200(self, api_client):
+    def test_retrieve_success(self, api_client):
         author = baker.make(Author)
         url = f"{self.endpoint}{author.id}/"
 
@@ -36,7 +36,7 @@ class TestAuthorEndpoints:
         assert response.status_code == 200
         assert json.loads(response.content) == expected_json
 
-    def test_retrieve_404(self, api_client):
+    def test_retrieve_not_found(self, api_client):
         author = baker.prepare(Author, id=1)
         url = f"{self.endpoint}{author.id}/"
 
