@@ -131,14 +131,15 @@ class SongViewSet(viewsets.ViewSet):
         detail=True, methods=["get"], permission_classes=(permissions.IsAuthenticated,)
     )
     def like(self, request, pk=None):
-        song = Song.objects.get(pk=pk)
-        collection = Collection.objects.filter(user=self.request.user)
+        song = get_object_or_404(Song, pk=pk)
+        collection = self.request.user.collection
         if collection:
-            collection = collection.first()
             collection.song.add(song)
             collection.save()
-        serializer = CollectionSerializer(collection, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = CollectionSerializer(collection, context={"request": request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class BlockedSongViewSet(viewsets.ViewSet):

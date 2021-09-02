@@ -21,13 +21,13 @@ class CollectionViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        collection = get_object_or_404(self.get_queryset(), pk=pk)
+        collection = get_object_or_404(Collection, pk=pk)
         serializer = CollectionSerializer(collection, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["delete"])
     def unlike(self, request, pk=None, song_id=None):
-        collection = get_object_or_404(self.get_queryset(), pk=pk)
-        song = get_object_or_404(Song.objects.all(), pk=song_id)
+        collection = get_object_or_404(Collection, pk=pk)
+        song = get_object_or_404(Song, pk=song_id)
         collection.song.remove(song)
         return Response(status=status.HTTP_204_NO_CONTENT)
