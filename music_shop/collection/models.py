@@ -7,7 +7,9 @@ User = get_user_model()
 
 
 class Collection(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="collection"
+    )
     song = models.ManyToManyField(Song, blank=True, null=True)
 
     def __str__(self):
