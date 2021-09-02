@@ -3,6 +3,7 @@ import json
 import pytest
 from model_bakery import baker
 
+from collection.models import Collection
 from song.models import BlockedSong, Song, SongData
 
 from ..confest import (
@@ -164,6 +165,19 @@ class TestSongEndpoints:
         data = {"comment": new_blocked_song.comment}
 
         response = client.put(url, data=data, format="json")
+
+        assert response.status_code == 200
+
+    def test_like(self, api_client, get_token):
+        client = api_client()
+        user = get_token(client)
+
+        song = baker.make(Song)
+        baker.prepare(Collection, user=user)
+
+        url = f"{self.endpoint}{song.pk}/like/"
+
+        response = client.get(url)
 
         assert response.status_code == 200
 

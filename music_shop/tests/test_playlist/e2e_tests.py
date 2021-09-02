@@ -1,7 +1,6 @@
 import json
 
 import pytest
-from django.contrib.auth.models import User
 from model_bakery import baker
 
 from playlist.models import Playlist
