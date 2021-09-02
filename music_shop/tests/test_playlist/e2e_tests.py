@@ -5,7 +5,7 @@ from model_bakery import baker
 
 from playlist.models import Playlist
 
-from ..confest import api_client, create_song, get_token
+from ..confest import api_client, create_song, create_user
 
 pytestmark = pytest.mark.django_db
 
@@ -29,21 +29,21 @@ class TestPlaylistEndpoints:
         response = api_client().get(url)
         assert response.status_code == 200
 
-    def test_create(self, api_client, get_token, create_song):
+    def test_create(self, api_client, create_user, create_song):
         playlist = baker.prepare(Playlist)
         count = Playlist.objects.count()
 
         expected_json = {"name": playlist.name, "song": [create_song.id]}
 
         client = api_client()
-        get_token(client)
+        create_user(client)
         response = client.post(self.endpoint, data=expected_json, format="json")
 
         assert response.status_code == 201
         assert Playlist.objects.count() == count + 1
         assert Playlist.objects.filter(pk=response.data["id"])
 
-    def test_update(self, api_client, get_token, create_song):
+    def test_update(self, api_client, create_user, create_song):
         old_playlist = baker.make(Playlist)
         new_playlist = baker.prepare(Playlist)
 
@@ -56,16 +56,16 @@ class TestPlaylistEndpoints:
         url = f"{self.endpoint}{old_playlist.id}/"
 
         client = api_client()
-        get_token(client)
+        create_user(client)
 
         response = client.put(url, playlist_dict, format="json")
 
         assert response.status_code == 200
         assert json.loads(response.content) == playlist_dict
 
-    def test_delete(self, api_client, get_token):
+    def test_delete(self, api_client, create_user):
         client = api_client()
-        user = get_token(client)
+        user = create_user(client)
 
         playlist = baker.make(Playlist, user=user)
 

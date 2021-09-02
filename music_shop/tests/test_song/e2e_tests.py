@@ -10,8 +10,8 @@ from ..confest import (
     api_client,
     create_data,
     create_song,
+    create_user,
     get_moderator_token,
-    get_token,
 )
 
 pytestmark = pytest.mark.django_db
@@ -168,9 +168,9 @@ class TestSongEndpoints:
 
         assert response.status_code == 200
 
-    def test_like(self, api_client, get_token):
+    def test_like(self, api_client, create_user):
         client = api_client()
-        user = get_token(client)
+        user = create_user(client)
 
         song = baker.make(Song)
         baker.prepare(Collection, user=user)
