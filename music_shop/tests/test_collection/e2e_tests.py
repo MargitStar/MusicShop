@@ -1,10 +1,9 @@
 import json
 
 import pytest
-from django.contrib.auth.models import User
 from model_bakery import baker
 
-from collection.models import Collection
+from song.models import Song
 
 from ..confest import api_client, create_song, get_token
 
@@ -32,3 +31,14 @@ class TestPlaylistEndpoints:
 
         response = client.get(url)
         assert response.status_code == 200
+
+    def test_unlike(self, api_client, get_token):
+        song = baker.make(Song)
+        client = api_client()
+        user = get_token(client)
+        collection = user.collection
+        collection.song.add(song)
+        collection_id = collection.id
+        url = f"{self.endpoint}{collection_id}/unlike/{song.id}/"
+        response = client.delete(url)
+        assert response.status_code == 204
