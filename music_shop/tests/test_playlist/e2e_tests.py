@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from django.contrib.auth.models import User
 from model_bakery import baker
 
 from playlist.models import Playlist
@@ -64,11 +65,12 @@ class TestPlaylistEndpoints:
         assert json.loads(response.content) == playlist_dict
 
     def test_delete(self, api_client, get_token):
-        playlist = baker.make(Playlist)
-        assert Playlist.objects.filter(pk=playlist.pk)
-
         client = api_client()
-        get_token(client)
+        user = get_token(client)
+
+        playlist = baker.make(Playlist, user=user)
+
+        assert Playlist.objects.filter(pk=playlist.pk)
 
         url = f"{self.endpoint}{playlist.pk}/"
 
