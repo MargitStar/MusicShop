@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
@@ -55,3 +55,10 @@ class AlbumViewSet(ViewSet):
             album_songs, many=True, context={"request": request}
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get_permissions(self):
+        if self.request.method == "GET" or self.request.method == "OPTIONS":
+            self.permission_classes = (permissions.AllowAny,)
+        else:
+            self.permission_classes = (permissions.IsAuthenticated,)
+        return super(AlbumViewSet, self).get_permissions()
