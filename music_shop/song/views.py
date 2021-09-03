@@ -132,14 +132,14 @@ class SongViewSet(viewsets.ViewSet):
     )
     def like(self, request, pk=None):
         song = get_object_or_404(Song, pk=pk)
-        collection = self.request.user.collection
-        if collection:
-            collection.song.add(song)
-            collection.save()
-            serializer = CollectionSerializer(collection, context={"request": request})
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
+        try:
+            collection = self.request.user.collection
+        except Collection.DoesNotExist:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        collection.song.add(song)
+        collection.save()
+        serializer = CollectionSerializer(collection, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class BlockedSongViewSet(viewsets.ViewSet):
