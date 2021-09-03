@@ -44,7 +44,7 @@ class TestPlaylistEndpoints:
         response = client.get(url)
         assert response.status_code == 404
 
-    def test_unlike(self, api_client, create_user):
+    def test_unlike_success(self, api_client, create_user):
         song = baker.make(Song)
         client = api_client()
         user = create_user(client)
@@ -54,3 +54,25 @@ class TestPlaylistEndpoints:
         url = f"{self.endpoint}{collection_id}/unlike/{song.id}/"
         response = client.delete(url)
         assert response.status_code == 204
+
+    def test_unlike_not_found_collection(self, api_client, create_user):
+        song = baker.make(Song)
+        client = api_client()
+        user = create_user(client)
+        collection = user.collection
+        collection.song.add(song)
+        collection_id = collection.id
+        url = f"{self.endpoint}{collection_id}/unlike/{song.id}/"
+        collection.delete()
+        response = client.delete(url)
+        assert response.status_code == 404
+
+    def test_unlike_not_found_song(self, api_client, create_user):
+        song = baker.make(Song)
+        client = api_client()
+        user = create_user(client)
+        collection = user.collection
+        collection_id = collection.id
+        url = f"{self.endpoint}{collection_id}/unlike/{song.id}/"
+        response = client.delete(url)
+        assert response.status_code == 404
