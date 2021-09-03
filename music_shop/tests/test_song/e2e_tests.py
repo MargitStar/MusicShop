@@ -144,9 +144,12 @@ class TestSongEndpoints:
         song = baker.make(Song)
         blocked_song = baker.prepare(BlockedSong)
         blocked_song.song = song
+
         url = f"{self.endpoint}{song.pk}/blocked/"
+
         client = api_client()
         get_moderator_token(client)
+
         data = {"comment": blocked_song.comment}
 
         response = client.put(url, data, format="json")
