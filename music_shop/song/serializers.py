@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from album.serializers import AlbumSerializerGet
 from author.serializers import AuthorSerializer
 from genre.serializers import GenreSerializer
 from song.models import BlockedSong, Song, SongData
@@ -14,17 +15,27 @@ class SongDataSerializer(serializers.HyperlinkedModelSerializer):
 class SongSerializerGet(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     author = AuthorSerializer(many=True)
+    album = AlbumSerializerGet()
     data = serializers.HyperlinkedRelatedField(read_only=True, view_name="song-data")
 
     class Meta:
         model = Song
-        fields = ("id", "title", "author", "release_date", "genre", "data")
+        fields = (
+            "id",
+            "title",
+            "author",
+            "release_date",
+            "album",
+            "genre",
+            "data",
+            "blocked",
+        )
 
 
 class SongSerializerPost(serializers.ModelSerializer):
     class Meta:
         model = Song
-        fields = ("id", "title", "author", "genre", "release_date", "data")
+        fields = ("id", "title", "author", "album", "genre", "release_date", "data")
 
 
 class BlockedSongSerializerPost(serializers.ModelSerializer):
