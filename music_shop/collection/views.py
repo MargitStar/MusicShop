@@ -29,7 +29,7 @@ class CollectionViewSet(viewsets.ViewSet):
     def unlike(self, request, pk=None, song_id=None):
         collection = get_object_or_404(self.get_queryset(), pk=pk)
         song = get_object_or_404(Song, pk=song_id)
-        if song in collection.song.all():
+        if collection.song.all().filter(id=song.id).exists():
             collection.song.remove(song)
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
