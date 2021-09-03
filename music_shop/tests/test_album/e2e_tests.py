@@ -36,12 +36,14 @@ class TestAlbumEndpoints:
         response = api_client().get(url)
         assert response.status_code == 404
 
-    def test_create(self, api_client):
+    def test_create(self, api_client, create_user):
         album = baker.prepare(Album)
         count = Album.objects.count()
 
         expected_json = {"name": album.name, "description": album.description}
+
         client = api_client()
+        create_user(client)
 
         response = client.post(self.endpoint, data=expected_json, format="json")
 
@@ -49,7 +51,7 @@ class TestAlbumEndpoints:
         assert Album.objects.count() == count + 1
         assert Album.objects.filter(pk=response.data["id"])
 
-    def test_update(self, api_client):
+    def test_update(self, api_client, create_user):
         old_album = baker.make(Album)
         new_album = baker.prepare(Album)
 
@@ -62,14 +64,16 @@ class TestAlbumEndpoints:
         url = f"{self.endpoint}{old_album.id}/"
 
         client = api_client()
+        create_user(client)
 
         response = client.put(url, playlist_dict, format="json")
 
         assert response.status_code == 200
         assert json.loads(response.content) == playlist_dict
 
-    def test_delete(self, api_client):
+    def test_delete(self, api_client, create_user):
         client = api_client()
+        create_user(client)
 
         album = baker.make(Album)
 
