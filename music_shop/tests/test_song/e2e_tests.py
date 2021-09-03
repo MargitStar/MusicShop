@@ -3,6 +3,7 @@ import json
 import pytest
 from model_bakery import baker
 
+from album.models import Album
 from collection.models import Collection
 from song.models import BlockedSong, Song, SongData
 
@@ -116,10 +117,12 @@ class TestSongEndpoints:
         old_song = baker.make(Song)
         new_song = baker.prepare(Song)
         song_data, genre, author = create_data
+        album = baker.make(Album)
         song_dict = {
             "id": old_song.id,
             "title": new_song.title,
             "author": [author.id],
+            "album": album.id,
             "genre": [genre.id],
             "release_date": str(new_song.release_date),
             "data": song_data.id,
@@ -128,6 +131,7 @@ class TestSongEndpoints:
         url = f"{self.endpoint}{old_song.id}/"
 
         response = api_client().put(url, song_dict, format="json")
+
         assert response.status_code == 200
         assert json.loads(response.content) == song_dict
 
