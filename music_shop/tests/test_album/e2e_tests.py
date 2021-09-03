@@ -49,7 +49,7 @@ class TestAlbumEndpoints:
         assert Album.objects.count() == count + 1
         assert Album.objects.filter(pk=response.data["id"])
 
-    def test_update(self, api_client, create_user, create_song):
+    def test_update(self, api_client):
         old_album = baker.make(Album)
         new_album = baker.prepare(Album)
 
@@ -81,3 +81,15 @@ class TestAlbumEndpoints:
 
         assert response.status_code == 204
         assert not Album.objects.filter(pk=album.pk)
+
+    def test_songs(self, api_client, create_song):
+        song = create_song
+        album = baker.make(Album)
+        album.album.add(song)
+
+        url = f"{self.endpoint}{album.pk}/songs/"
+
+        client = api_client()
+        response = client.get(url)
+
+        assert response.status_code == 200
