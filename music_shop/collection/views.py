@@ -21,13 +21,19 @@ class CollectionViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        collection = get_object_or_404(Collection, pk=pk)
+        collection = get_object_or_404(self.get_queryset(), pk=pk)
         serializer = CollectionSerializer(collection, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["delete"])
     def unlike(self, request, pk=None, song_id=None):
-        collection = get_object_or_404(Collection, pk=pk)
+        collection = get_object_or_404(self.get_queryset(), pk=pk)
         song = get_object_or_404(Song, pk=song_id)
-        collection.song.remove(song)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if song in collection.song.all():
+            collection.song.remove(song)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(
+                "There is no such a song in your collection!",
+                status=status.HTTP_404_NOT_FOUND,
+            )
