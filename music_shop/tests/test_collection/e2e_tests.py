@@ -3,6 +3,7 @@ import json
 import pytest
 from model_bakery import baker
 
+from collection.models import Collection
 from song.models import Song
 
 from ..confest import api_client, create_song, create_user
@@ -23,7 +24,7 @@ class TestPlaylistEndpoints:
         assert response.status_code == 200
         assert len(json.loads(response.content)) == 1
 
-    def test_retrieve(self, api_client, create_user):
+    def test_retrieve_success(self, api_client, create_user):
         client = api_client()
         user = create_user(client)
         collection_id = user.collection.id
@@ -31,6 +32,17 @@ class TestPlaylistEndpoints:
 
         response = client.get(url)
         assert response.status_code == 200
+
+    def test_retrieve_not_found(self, api_client, create_user):
+        client = api_client()
+        user = create_user(client)
+        collection = user.collection
+        url = f"{self.endpoint}{collection.id}/"
+
+        collection.delete()
+
+        response = client.get(url)
+        assert response.status_code == 404
 
     def test_unlike(self, api_client, create_user):
         song = baker.make(Song)
