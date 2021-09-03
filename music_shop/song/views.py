@@ -5,6 +5,8 @@ from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from collection.models import Collection
+from collection.serializers import CollectionSerializer
 from playlist.models import Playlist
 from song.filters import SongFilter
 from song.models import BlockedSong, Song, SongData
@@ -124,6 +126,20 @@ class SongViewSet(viewsets.ViewSet):
             return Response(
                 f"{song.title} is in blacklist now", status=status.HTTP_200_OK
             )
+
+    @action(
+        detail=True, methods=["get"], permission_classes=(permissions.IsAuthenticated,)
+    )
+    def like(self, request, pk=None):
+        song = get_object_or_404(Song, pk=pk)
+        try:
+            collection = self.request.user.collection
+        except Collection.DoesNotExist:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        collection.song.add(song)
+        collection.save()
+        serializer = CollectionSerializer(collection, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class BlockedSongViewSet(viewsets.ViewSet):
