@@ -168,18 +168,31 @@ class TestSongEndpoints:
 
         assert response.status_code == 200
 
-    def test_like(self, api_client, create_user):
+    def test_like_success(self, api_client, create_user):
         client = api_client()
-        user = create_user(client)
+        create_user(client)
 
         song = baker.make(Song)
-        baker.prepare(Collection, user=user)
 
         url = f"{self.endpoint}{song.pk}/like/"
 
         response = client.get(url)
 
         assert response.status_code == 200
+
+    def test_like_server_error(self, api_client, create_user):
+        client = api_client()
+        user = create_user(client)
+
+        song = baker.make(Song)
+        collection = Collection.objects.filter(user=user)
+        collection.delete()
+
+        url = f"{self.endpoint}{song.pk}/like/"
+
+        response = client.get(url)
+
+        assert response.status_code == 500
 
 
 class TestBlockedSongEndpoints:
