@@ -26,7 +26,7 @@ schema_view = get_schema_view(
         title="Music Shop API", default_version="v1", description="music shop"
     ),
     public=True,
-    permission_classes=[permissions.AllowAny],
+    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
@@ -34,6 +34,8 @@ urlpatterns = [
     path("api/", include("song.urls")),
     path("api/", include("playlist.urls")),
     path("api/", include("collection.urls")),
+    path("api/", include("genre.urls")),
+    path("api/", include("author.urls")),
     path("api/", include("user.urls", namespace="user")),
     path(
         "swagger/",
