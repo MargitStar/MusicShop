@@ -1,22 +1,24 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from album.models import Album
 from album.serializers import AlbumSerializer
+from song.serializers import SongSerializerGet
 
 
 class AlbumViewSet(ViewSet):
     def list(self, request, *args, **kwargs):
         queryset = Album.objects.all()
-        serializer = AlbumSerializer(queryset, many=True, context={"request": request})
+        serializer = AlbumSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
         queryset = Album.objects.all()
         album = get_object_or_404(queryset, pk=pk)
-        serializer = AlbumSerializer(album, context={"request": request})
+        serializer = AlbumSerializer(album)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
@@ -44,3 +46,12 @@ class AlbumViewSet(ViewSet):
         album = get_object_or_404(queryset, pk=pk)
         album.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["get"])
+    def songs(self, request, pk=None):
+        album = get_object_or_404(Album, pk=pk)
+        album_songs = album.album.all()
+        serializer = SongSerializerGet(
+            album_songs, many=True, context={"request": request}
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
