@@ -27,7 +27,7 @@ class SongDataCreateView(viewsets.GenericViewSet, mixins.CreateModelMixin):
 
 class SongViewSet(viewsets.ViewSet):
     def get_queryset(self):
-        return Song.objects.filter(blocked=False)
+        return Song.objects.filter(blocked=False).prefetch_related("author", "genre")
 
     def list(self, request, *args, **kwargs):
         fil = SongFilter(request.GET, queryset=self.get_queryset())
@@ -145,15 +145,22 @@ class SongViewSet(viewsets.ViewSet):
 class BlockedSongViewSet(viewsets.ViewSet):
     permission_classes = (ModeratorPermission,)
 
+    def get_queryset(self):
+        return (
+            BlockedSong.objects.all()
+            .select_related("song", "user")
+            .prefetch_related("song__author", "song__genre")
+        )
+
     def list(self, request, *args, **kwargs):
-        queryset = BlockedSong.objects.all()
+        queryset = self.get_queryset()
         serializer = BlockedSongSerializerGet(
             queryset, many=True, context={"request": request}
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        queryset = BlockedSong.objects.all()
+        queryset = self.get_queryset()
         blocked_song = get_object_or_404(queryset, pk=pk)
         serializer = BlockedSongSerializerGet(
             blocked_song, context={"request": request}
@@ -161,7 +168,7 @@ class BlockedSongViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk=None):
-        queryset = BlockedSong.objects.all()
+        queryset = self.get_queryset()
         blocked_song = get_object_or_404(queryset, pk=pk)
         blocked_song.song.blocked = False
         blocked_song.song.save()
