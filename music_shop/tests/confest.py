@@ -1,6 +1,5 @@
 import pytest
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from model_bakery import baker
 from rest_framework.test import APIClient
 
@@ -32,8 +31,8 @@ def create_user():
 def get_moderator_token():
     def _get_moderator_token(client):
         user = User.objects.create_user(username="Star", password="star")
-        group, created = Group.objects.get_or_create(name="Moderator")
-        group.user_set.add(user)
+        user.group = "Moderator"
+        user.save()
         token_url = "/api/token/"
         token = client.post(token_url, {"username": "Star", "password": "star"})
         client.credentials(HTTP_AUTHORIZATION="Bearer " + token.data["access"])
