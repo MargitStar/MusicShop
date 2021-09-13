@@ -14,8 +14,7 @@ class AuthorViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        queryset = Author.objects.all()
-        author = get_object_or_404(queryset, pk=pk)
+        author = get_object_or_404(Author, pk=pk)
         serializer = AuthorSerializer(author, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -23,8 +22,7 @@ class AuthorViewSet(viewsets.ViewSet):
         detail=True, methods=["get"], permission_classes=(permissions.IsAuthenticated,)
     )
     def like(self, request, pk=None):
-        queryset = Author.objects.all()
-        author = get_object_or_404(queryset, pk=pk)
+        author = get_object_or_404(Author, pk=pk)
         user = self.request.user
         user.favourite_author.add(author)
         user.save()

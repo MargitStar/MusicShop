@@ -14,8 +14,7 @@ class GenreViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        queryset = Genre.objects.all()
-        genre = get_object_or_404(queryset, pk=pk)
+        genre = get_object_or_404(Genre, pk=pk)
         serializer = GenreSerializer(genre, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -23,8 +22,7 @@ class GenreViewSet(viewsets.ViewSet):
         detail=True, methods=["get"], permission_classes=(permissions.IsAuthenticated,)
     )
     def like(self, request, pk=None):
-        queryset = Genre.objects.all()
-        genre = get_object_or_404(queryset, pk=pk)
+        genre = get_object_or_404(Genre, pk=pk)
         user = self.request.user
         user.favourite_genre.add(genre)
         user.save()
