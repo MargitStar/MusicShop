@@ -13,7 +13,7 @@ class PlaylistViewSet(ViewSet):
     def get_queryset(self):
         return (
             Playlist.objects.all()
-            .prefetch_related("song", "song__author", "song__genre")
+            .prefetch_related("song", "song__author", "song__genre", "song__album")
             .select_related("user")
         )
 

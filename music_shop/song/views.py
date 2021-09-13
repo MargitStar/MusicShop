@@ -27,7 +27,11 @@ class SongDataCreateView(viewsets.GenericViewSet, mixins.CreateModelMixin):
 
 class SongViewSet(viewsets.ViewSet):
     def get_queryset(self):
-        return Song.objects.filter(blocked=False).prefetch_related("author", "genre")
+        return (
+            Song.objects.filter(blocked=False)
+            .prefetch_related("author", "genre")
+            .select_related("album")
+        )
 
     def list(self, request, *args, **kwargs):
         fil = SongFilter(request.GET, queryset=self.get_queryset())
