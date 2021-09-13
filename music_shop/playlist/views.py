@@ -10,15 +10,22 @@ from playlist.validation import validate_songs
 
 
 class PlaylistViewSet(ViewSet):
+    def get_queryset(self):
+        return (
+            Playlist.objects.all()
+            .prefetch_related("song", "song__author", "song__genre", "song__album")
+            .select_related("user")
+        )
+
     def list(self, request, *args, **kwargs):
-        queryset = Playlist.objects.all()
+        queryset = self.get_queryset()
         serializer = PlaylistSerializer(
             queryset, many=True, context={"request": request}
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        queryset = Playlist.objects.all()
+        queryset = self.get_queryset()
         playlist = get_object_or_404(queryset, pk=pk)
         serializer = PlaylistSerializer(playlist, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -32,7 +39,7 @@ class PlaylistViewSet(ViewSet):
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
-        queryset = Playlist.objects.filter(pk=kwargs["pk"])
+        queryset = self.get_queryset().filter(pk=kwargs["pk"])
         validate_songs(request)
 
         if queryset:
@@ -50,7 +57,7 @@ class PlaylistViewSet(ViewSet):
 
     def destroy(self, request, pk=None):
         user = self.request.user
-        queryset = Playlist.objects.all()
+        queryset = self.get_queryset()
         playlist = get_object_or_404(queryset, pk=pk)
         if user == playlist.user:
             playlist.delete()

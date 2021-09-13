@@ -12,7 +12,9 @@ class CollectionViewSet(viewsets.ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        return Collection.objects.filter(user=self.request.user)
+        return Collection.objects.filter(user=self.request.user).prefetch_related(
+            "song", "song__author", "song__genre", "song__album"
+        )
 
     def list(self, request, *args, **kwargs):
         serializer = CollectionSerializer(
