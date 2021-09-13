@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 
+from genre.models import Genre
 from user.managers import CustomUserManager
 
 
@@ -11,6 +12,7 @@ class CustomUser(AbstractBaseUser):
     username = models.CharField("username", max_length=100, unique=True)
     email = models.EmailField("email", unique=True, blank=True, null=True)
     group = models.CharField(max_length=100, default="User")
+    favourite_genre = models.ManyToManyField(Genre, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
