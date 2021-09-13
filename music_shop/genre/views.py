@@ -28,4 +28,7 @@ class GenreViewSet(viewsets.ViewSet):
         user = self.request.user
         user.favourite_genre.add(genre)
         user.save()
-        return Response(f"{genre.name} is added to your favourite genres!")
+        return Response(
+            f"{genre.name} is added to your favourite genres!",
+            status=status.HTTP_200_OK,
+        )
