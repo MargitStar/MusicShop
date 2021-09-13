@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from album.models import Album
 from author.models import Author
 from genre.models import Genre
 
@@ -19,6 +20,9 @@ class Song(models.Model):
     author = models.ManyToManyField(Author)
     release_date = models.DateField()
     genre = models.ManyToManyField(Genre)
+    album = models.ForeignKey(
+        Album, on_delete=models.CASCADE, related_name="album", blank=True, null=True
+    )
     data = models.OneToOneField(SongData, on_delete=models.CASCADE, verbose_name="song")
     blocked = models.BooleanField(default=False)
 
